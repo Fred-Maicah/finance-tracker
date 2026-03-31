@@ -1,5 +1,6 @@
 "use client";
 
+import { Bar } from "react-chartjs-2";
 import { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import {
@@ -7,9 +8,12 @@ import {
   ArcElement,
   Tooltip,
   Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
 } from "chart.js";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 type Transaction = {
   _id: string;
@@ -21,43 +25,73 @@ type Transaction = {
 
 export default function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [type, setType] = useState<"income" | "expense">("income");
-  const [amount, setAmount] = useState<number>(0);
+
+  // ✅ ADD THESE (fix your error)
+  const [type, setType] = useState("income");
+  const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-
-  const fetchTransactions = async () => {
-    const res = await fetch("/api/transactions", { credentials: "include" });
-    const data = await res.json();
-    if (res.ok) setTransactions(data.transactions);
-  };
-
-  const addTransaction = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/transactions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ type, amount, description }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setTransactions([data.transaction, ...transactions]);
-      setAmount(0);
-      setDescription("");
-    } else alert(data.error);
-  };
+  const [category, setCategory] = useState("Food");
 
   useEffect(() => {
-    fetchTransactions();
+    fetch("/api/transactions")
+      .then((res) => res.json())
+      .then((data) => setTransactions(data.transactions || []));
   }, []);
+
+  // ✅ HANDLE ADD TRANSACTION
+  const handleAdd = async () => {
+    await fetch("/api/transactions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type,
+        amount: Number(amount),
+        description,
+        category,
+      }),
+    });
+
+    // reload data
+    const res = await fetch("/api/transactions");
+    const data = await res.json();
+    setTransactions(data.transactions || []);
+
+    // reset form
+    setAmount("");
+    setDescription("");
+  };
 
   const totalIncome = transactions
     .filter((t) => t.type === "income")
-    .reduce((acc, t) => acc + t.amount, 0);
+    .reduce((a, t) => a + t.amount, 0);
+
+  const monthlyData: { [key: string]: number } = {};
+
+  transactions.forEach((t) => {
+    const month = new Date(t.date).toLocaleString("default", {
+      month: "short",
+    });
+
+    if (!monthlyData[month]) monthlyData[month] = 0;
+    monthlyData[month] += t.amount;
+  });
+
+  const barData = {
+    labels: Object.keys(monthlyData),
+    datasets: [
+      {
+        label: "Monthly Spending",
+        data: Object.values(monthlyData),
+        backgroundColor: "#6366f1",
+      },
+    ],
+  };
 
   const totalExpense = transactions
     .filter((t) => t.type === "expense")
-    .reduce((acc, t) => acc + t.amount, 0);
+    .reduce((a, t) => a + t.amount, 0);
 
   const balance = totalIncome - totalExpense;
 
@@ -65,95 +99,130 @@ export default function DashboardPage() {
     labels: ["Income", "Expenses"],
     datasets: [
       {
-        label: "Finance Overview",
         data: [totalIncome, totalExpense],
-        backgroundColor: ["#16a34a", "#dc2626"], // green, red
-        borderWidth: 1,
+        backgroundColor: ["#16a34a", "#dc2626"],
       },
     ],
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">
-        Finance Tracker
-      </h1>
+    <div className="bg-gray-100 min-h-screen p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
 
-      {/* Summary */}
-      <div className="grid grid-cols-3 gap-6 mb-8 text-center">
-        <div className="p-6 rounded shadow bg-white">
-          <h2 className="font-semibold text-gray-600">Balance</h2>
-          <p className="text-2xl font-bold">${balance}</p>
-        </div>
-        <div className="p-6 rounded shadow bg-white">
-          <h2 className="font-semibold text-gray-600">Income</h2>
-          <p className="text-2xl font-bold text-green-600">${totalIncome}</p>
-        </div>
-        <div className="p-6 rounded shadow bg-white">
-          <h2 className="font-semibold text-gray-600">Expenses</h2>
-          <p className="text-2xl font-bold text-red-600">${totalExpense}</p>
-        </div>
-      </div>
+        {/* Header */}
+        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
 
-      {/* Doughnut Chart */}
-      <div className="mb-8 bg-white p-6 rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Income vs Expenses</h2>
-        <Doughnut data={chartData} />
-      </div>
+        {/* ✅ ADD TRANSACTION FORM */}
+        <div className="bg-white p-6 rounded-xl shadow space-y-3">
+          <h2 className="font-semibold">Add Transaction</h2>
 
-      {/* Add Transaction Form */}
-      <form onSubmit={addTransaction} className="mb-8 space-y-3 bg-white p-6 rounded shadow">
-        <div className="flex gap-4">
           <select
             value={type}
-            onChange={(e) => setType(e.target.value as any)}
-            className="border p-2 rounded flex-1"
+            onChange={(e) => setType(e.target.value)}
+            className="border p-2 rounded w-full"
           >
             <option value="income">Income</option>
             <option value="expense">Expense</option>
           </select>
+
           <input
             type="number"
             placeholder="Amount"
-            className="border p-2 rounded flex-1"
             value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
+            onChange={(e) => setAmount(e.target.value)}
+            className="border p-2 rounded w-full"
           />
-        </div>
-        <input
-          type="text"
-          placeholder="Description"
-          className="border p-2 rounded w-full"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <button className="bg-black text-white px-4 py-2 rounded w-full hover:bg-gray-800 transition">
-          Add Transaction
-        </button>
-      </form>
 
-      {/* Transactions List */}
-      <div className="bg-white rounded shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Transactions</h2>
-        <ul className="divide-y divide-gray-200">
-          {transactions.map((t) => (
-            <li key={t._id} className="py-3 flex justify-between items-center">
-              <div>
-                <p className="font-medium">{t.description || "No description"}</p>
-                <p className="text-sm text-gray-500">{new Date(t.date).toLocaleString()}</p>
-              </div>
-              <span
-                className={
-                  t.type === "income"
-                    ? "text-green-600 font-semibold"
-                    : "text-red-600 font-semibold"
-                }
-              >
-                {t.type === "income" ? "+" : "-"}${t.amount}
-              </span>
-            </li>
-          ))}
-        </ul>
+          <input
+            type="text"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="border p-2 rounded w-full"
+          />
+
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="border p-2 rounded w-full"
+          >
+            <option>Food</option>
+            <option>Nepa Bill</option>
+            <option>Transport</option>
+            <option>Salary</option>
+            <option>House Rent</option>
+            <option>Gas, Fuel, Water Bill</option>
+            <option>Data Subscription</option>
+            <option>Clothing</option>
+          </select>
+
+          <button
+            onClick={handleAdd}
+            className="bg-indigo-600 text-white px-4 py-2 rounded w-full"
+          >
+            Add Transaction
+          </button>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow">
+            <p>Total Balance</p>
+            <h2 className="text-2xl font-bold">₦{balance}</h2>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h2 className="font-semibold mb-4">Monthly Analytics</h2>
+            <Bar data={barData} />
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow">
+            <p>Income</p>
+            <h2 className="text-green-600 font-bold">₦{totalIncome}</h2>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow">
+            <p>Expenses</p>
+            <h2 className="text-red-600 font-bold">₦{totalExpense}</h2>
+          </div>
+        </div>
+
+        {/* Chart */}
+        <div className="bg-white p-6 rounded-xl shadow">
+          <h2 className="font-semibold mb-4">Spending Overview</h2>
+          <Doughnut data={chartData} />
+        </div>
+
+        {/* Transactions */}
+        <div className="bg-white p-6 rounded-xl shadow">
+          <h2 className="font-semibold mb-4">Recent Transactions</h2>
+
+          {transactions.length === 0 ? (
+            <p className="text-gray-500 text-center">No transactions yet</p>
+          ) : (
+            <ul className="divide-y">
+              {transactions.map((t) => (
+                <li key={t._id} className="py-3 flex justify-between">
+                  <div>
+                    <p>{t.description || "Transaction"}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(t.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span
+                    className={
+                      t.type === "income"
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
+                    {t.type === "income" ? "+" : "-"}₦{t.amount}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );
