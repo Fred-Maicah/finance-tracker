@@ -1,22 +1,35 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    router.push("/login");
+  };
+
   return (
-    <nav className="bg-white border-b shadow-sm px-6 py-4">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
-
-        <h1 className="text-xl font-bold text-indigo-600">
-          💰 FinTrack
-        </h1>
-
-        <div className="flex gap-6 text-gray-600 font-medium">
-          <Link href="/">Dashboard</Link>
-          <Link href="/login">Login</Link>
-          <Link href="/register">Register</Link>
-        </div>
+    <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
+      {/* Logo + Name */}
+      <div className="flex items-center space-x-2">
+        <div className="w-8 h-8 bg-indigo-600 rounded-full"></div>
+        <h1 className="font-bold text-lg">Finance Tracker</h1>
       </div>
+
+      {/* Logout */}
+      <button
+        onClick={handleLogout}
+        className="text-red-600 font-medium hover:underline"
+      >
+        Logout
+      </button>
     </nav>
   );
 }
+

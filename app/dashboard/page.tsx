@@ -12,6 +12,7 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
+import Navbar from "@/components/Navbar";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -25,6 +26,7 @@ type Transaction = {
 
 export default function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [user, setUser] = useState<any>(null);
 
   const [type, setType] = useState("income");
   const [amount, setAmount] = useState("");
@@ -43,8 +45,18 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+  // Fetch transactions (your existing function)
+  fetchTransactions();
+
+  // ✅ Fetch user for greeting
+  fetch("/api/profile", {
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((data) => setUser(data.user))
+    .catch((err) => console.error("Failed to fetch user:", err));
+
+}, []);
 
   // ✅ ADD TRANSACTION
   const handleAdd = async () => {
@@ -112,8 +124,12 @@ export default function DashboardPage() {
   return (
     <div className="bg-gray-100 min-h-screen p-6">
       <div className="max-w-6xl mx-auto space-y-6">
+      <Navbar />  
 
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800">
+            Hi, {user?.name || "User"} 👋
+        </h1>
+
 
         {/* ADD TRANSACTION */}
         <div className="bg-white p-6 rounded-xl shadow space-y-3">
@@ -193,7 +209,12 @@ export default function DashboardPage() {
         {/* CHART */}
         <div className="bg-white p-6 rounded-xl shadow">
           <h2 className="font-semibold mb-4">Spending Overview</h2>
-          <Doughnut data={chartData} />
+          <div className="w-40 h-40 mx-auto">
+           <Doughnut
+            data={chartData}
+            options={{ maintainAspectRatio: false }}
+           />
+          </div>
         </div>
 
         {/* TRANSACTIONS */}
