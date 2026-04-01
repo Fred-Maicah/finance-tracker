@@ -26,41 +26,49 @@ type Transaction = {
 export default function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  // ✅ ADD THESE (fix your error)
   const [type, setType] = useState("income");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
 
+  // ✅ GET TRANSACTIONS FROM COOKIE
+  const fetchTransactions = async () => {
+    try {
+      const res = await fetch("/api/transactions", { method: "GET" });
+      const data = await res.json();
+      setTransactions(data.transactions || []);
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+    }
+  };
+
   useEffect(() => {
-    fetch("/api/transactions")
-      .then((res) => res.json())
-      .then((data) => setTransactions(data.transactions || []));
+    fetchTransactions();
   }, []);
 
-  // ✅ HANDLE ADD TRANSACTION
+  // ✅ ADD TRANSACTION
   const handleAdd = async () => {
-    await fetch("/api/transactions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        type,
-        amount: Number(amount),
-        description,
-        category,
-      }),
-    });
+    try {
+      await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          amount: Number(amount),
+          description,
+          category,
+        }),
+      });
 
-    // reload data
-    const res = await fetch("/api/transactions");
-    const data = await res.json();
-    setTransactions(data.transactions || []);
+      // 🔄 RELOAD TRANSACTIONS
+      fetchTransactions();
 
-    // reset form
-    setAmount("");
-    setDescription("");
+      // reset form
+      setAmount("");
+      setDescription("");
+    } catch (error) {
+      console.error("Failed to add transaction:", error);
+    }
   };
 
   const totalIncome = transactions
@@ -68,12 +76,8 @@ export default function DashboardPage() {
     .reduce((a, t) => a + t.amount, 0);
 
   const monthlyData: { [key: string]: number } = {};
-
   transactions.forEach((t) => {
-    const month = new Date(t.date).toLocaleString("default", {
-      month: "short",
-    });
-
+    const month = new Date(t.date).toLocaleString("default", { month: "short" });
     if (!monthlyData[month]) monthlyData[month] = 0;
     monthlyData[month] += t.amount;
   });
@@ -109,10 +113,9 @@ export default function DashboardPage() {
     <div className="bg-gray-100 min-h-screen p-6">
       <div className="max-w-6xl mx-auto space-y-6">
 
-        {/* Header */}
         <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
 
-        {/* ✅ ADD TRANSACTION FORM */}
+        {/* ADD TRANSACTION */}
         <div className="bg-white p-6 rounded-xl shadow space-y-3">
           <h2 className="font-semibold">Add Transaction</h2>
 
@@ -164,7 +167,7 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* Summary Cards */}
+        {/* SUMMARY */}
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl shadow">
             <p>Total Balance</p>
@@ -187,13 +190,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Chart */}
+        {/* CHART */}
         <div className="bg-white p-6 rounded-xl shadow">
           <h2 className="font-semibold mb-4">Spending Overview</h2>
           <Doughnut data={chartData} />
         </div>
 
-        {/* Transactions */}
+        {/* TRANSACTIONS */}
         <div className="bg-white p-6 rounded-xl shadow">
           <h2 className="font-semibold mb-4">Recent Transactions</h2>
 

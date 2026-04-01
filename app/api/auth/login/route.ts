@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 import { serialize } from "cookie";
 
 export async function POST(req: Request) {
@@ -11,49 +12,49 @@ export async function POST(req: Request) {
     const { email, password } = await req.json();
 
     if (!email || !password) {
-      return Response.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return Response.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return Response.json({ error: "Invalid credentials" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 400 });
     }
 
+    // ✅ CREATE TOKEN
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET as string,
       { expiresIn: "7d" }
     );
 
+    // ✅ SET COOKIE
     const cookie = serialize("token", token, {
       httpOnly: true,
-      secure: false, // IMPORTANT for local dev
+      secure: process.env.NODE_ENV === "production", // ✅ auto switch
+      sameSite: "strict",
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return new Response(
-      JSON.stringify({ message: "Login successful" }),
-      {
-        status: 200,
-        headers: {
-          "Set-Cookie": cookie,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = NextResponse.json({
+      message: "Login successful",
+    });
+
+    response.headers.set("Set-Cookie", cookie);
+
+    return response;
 
   } catch (error) {
     console.error(error);
 
-    return Response.json(
+    return NextResponse.json(
       { error: "Server error" },
       { status: 500 }
     );

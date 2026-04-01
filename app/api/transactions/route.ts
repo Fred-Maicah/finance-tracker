@@ -1,14 +1,18 @@
 import { connectDB } from "@/lib/db";
 import Transaction from "@/models/Transaction";
 import { verifyToken } from "@/lib/auth";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-// ✅ GET ALL TRANSACTIONS (THIS WAS MISSING)
+// 🔹 GET ALL TRANSACTIONS
 export async function GET(req: Request) {
   try {
     await connectDB();
 
-    const token = req.headers.get("authorization")?.split(" ")[1];
+    // ✅ READ TOKEN FROM COOKIE
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -27,13 +31,15 @@ export async function GET(req: Request) {
   }
 }
 
-
-// ✅ YOUR EXISTING POST (UNCHANGED)
+// 🔹 CREATE NEW TRANSACTION
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const token = req.headers.get("authorization")?.split(" ")[1];
+    // ✅ READ TOKEN FROM COOKIE
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

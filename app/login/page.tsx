@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const router = useRouter();
 
-  // 👇 Define state variables
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -18,13 +17,16 @@ export default function LoginPage() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }), // ✅ both email & password exist now
-      credentials: "include",
+      body: JSON.stringify({ email, password }),
+      credentials: "include", // ✅ IMPORTANT for cookies
     });
 
     const data = await res.json();
 
     if (res.ok) {
+      // ❌ NO localStorage anymore
+      // ✅ Cookie is already set by backend
+
       router.push("/dashboard");
     } else {
       alert(data.error);
