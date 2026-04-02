@@ -2,6 +2,7 @@
 
 import { Bar } from "react-chartjs-2";
 import { useEffect, useState } from "react";
+import Footer from "@/components/Footer";
 import { Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -121,18 +122,25 @@ export default function DashboardPage() {
     ],
   };
 
+  const hour = new Date().getHours();
+
+  const greeting =
+    hour < 12 ? "Good morning" :
+    hour < 18 ? "Good afternoon" :
+    "Good evening";
+
+
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-      <Navbar />  
+    <div className="bg-gray-50 min-h-screen p-6">
+      <div className="max-w-6xl mx-auto space-y-6">  
 
         <h1 className="text-3xl font-bold text-gray-800">
-            Hi, {user?.name || "User"} 👋
+            {greeting}, {user?.name || "User"} 👋
         </h1>
 
 
         {/* ADD TRANSACTION */}
-        <div className="bg-white p-6 rounded-xl shadow space-y-3">
+        <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
           <h2 className="font-semibold">Add Transaction</h2>
 
           <select
@@ -177,7 +185,7 @@ export default function DashboardPage() {
 
           <button
             onClick={handleAdd}
-            className="bg-indigo-600 text-white px-4 py-2 rounded w-full"
+            className="bg-indigo-600 text-white px-4 py-2 rounded w-full hover:bg-indigo-700 transition"
           >
             Add Transaction
           </button>
@@ -185,29 +193,29 @@ export default function DashboardPage() {
 
         {/* SUMMARY */}
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow">
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
             <p>Total Balance</p>
             <h2 className="text-2xl font-bold">₦{balance}</h2>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow">
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
             <h2 className="font-semibold mb-4">Monthly Analytics</h2>
             <Bar data={barData} />
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow">
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
             <p>Income</p>
             <h2 className="text-green-600 font-bold">₦{totalIncome}</h2>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow">
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
             <p>Expenses</p>
             <h2 className="text-red-600 font-bold">₦{totalExpense}</h2>
           </div>
         </div>
 
         {/* CHART */}
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
           <h2 className="font-semibold mb-4">Spending Overview</h2>
           <div className="w-40 h-40 mx-auto">
            <Doughnut
@@ -218,7 +226,7 @@ export default function DashboardPage() {
         </div>
 
         {/* TRANSACTIONS */}
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
           <h2 className="font-semibold mb-4">Recent Transactions</h2>
 
           {transactions.length === 0 ? (
@@ -248,6 +256,7 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

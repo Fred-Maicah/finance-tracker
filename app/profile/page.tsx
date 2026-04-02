@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Footer from "@/components/Footer";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
@@ -24,6 +25,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <Navbar />
       <div className="bg-white p-6 rounded-xl shadow w-full max-w-md space-y-4">
         <h1 className="text-2xl font-bold">Profile</h1>
 
@@ -57,6 +59,7 @@ export default function ProfilePage() {
           <p>Loading...</p>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
