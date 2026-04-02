@@ -2,6 +2,7 @@
 
 import { Bar } from "react-chartjs-2";
 import { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Doughnut } from "react-chartjs-2";
 import {
@@ -13,7 +14,6 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
-import Navbar from "@/components/Navbar";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -132,6 +132,7 @@ export default function DashboardPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen p-6">
+      <Navbar />
       <div className="max-w-6xl mx-auto space-y-6">  
 
         <h1 className="text-3xl font-bold text-gray-800">
