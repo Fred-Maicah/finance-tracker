@@ -147,7 +147,12 @@ export default function DashboardPage() {
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="border p-2 rounded w-full"
+            className="text-gray-500 dark:text-gray-500 border p-2 rounded-lg w-full text-sm 
+              transition-all 
+              peer-placeholder-shown:top-3.5 
+              peer-placeholder-shown:text-sm 
+              peer-focus:top-2 peer-focus:text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 
+              focus:border-indigo-500 transition"
           >
             <option value="income">Income</option>
             <option value="expense">Expense</option>
@@ -158,7 +163,12 @@ export default function DashboardPage() {
             placeholder="Amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded-lg w-full text-sm 
+              transition-all 
+              peer-placeholder-shown:top-3.5 
+              peer-placeholder-shown:text-sm 
+              peer-focus:top-2 peer-focus:text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 
+              focus:border-indigo-500 transition"
           />
 
           <input
@@ -166,57 +176,68 @@ export default function DashboardPage() {
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded-lg w-full text-sm 
+              transition-all 
+              peer-placeholder-shown:top-3.5 
+              peer-placeholder-shown:text-sm 
+              peer-focus:top-2 peer-focus:text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 
+              focus:border-indigo-500 transition"
           />
 
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="border p-2 rounded w-full"
+            className="text-gray-500 dark:text-gray-500 border p-2 rounded-lg w-full text-sm 
+              transition-all 
+              peer-placeholder-shown:top-3.5 
+              peer-placeholder-shown:text-sm 
+              peer-focus:top-2 peer-focus:text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 
+              focus:border-indigo-500 transition"
           >
             <option>Food</option>
-            <option>Nepa Bill</option>
+            <option>Electricity Bill</option>
             <option>Transport</option>
             <option>Salary</option>
             <option>House Rent</option>
-            <option>Gas, Fuel, Water Bill</option>
+            <option>Gas, Fuel</option>
             <option>Data Subscription</option>
             <option>Clothing</option>
+            <option>Other</option>
           </select>
 
           <button
             onClick={handleAdd}
-            className="bg-indigo-600 text-white px-4 py-2 rounded w-full hover:bg-indigo-700 transition"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-xl w-full hover:bg-indigo-700 shadow-sm transition"
           >
             Add Transaction
           </button>
         </div>
 
         {/* SUMMARY */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:scale-[1.02] transition-transform">
             <p>Total Balance</p>
             <h2 className="text-2xl font-bold">₦{balance}</h2>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:scale-[1.02] transition-transform">
             <h2 className="font-semibold mb-4">Monthly Analytics</h2>
             <Bar data={barData} />
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:scale-[1.02] transition-transform">
             <p>Income</p>
             <h2 className="text-green-600 font-bold">₦{totalIncome}</h2>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+          <div className="bg-white p-6 rounded-2xl shadow-sm hover:scale-[1.02] transition-transform">
             <p>Expenses</p>
             <h2 className="text-red-600 font-bold">₦{totalExpense}</h2>
           </div>
         </div>
 
         {/* CHART */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+        <div className="bg-white p-6 rounded-2xl shadow-sm hover:scale-[1.02] transition-transform">
           <h2 className="font-semibold mb-4">Spending Overview</h2>
           <div className="w-40 h-40 mx-auto">
            <Doughnut

@@ -40,28 +40,43 @@ export default function RegisterPage() {
         <input
           type="text"
           placeholder="Name"
-          className="border p-2 w-full"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          className="border p-2 rounded-lg w-full text-sm 
+              transition-all 
+              peer-placeholder-shown:top-3.5 
+              peer-placeholder-shown:text-sm 
+              peer-focus:top-2 peer-focus:text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 
+              focus:border-indigo-500 transition"
         />
 
         <input
           type="email"
           placeholder="Email"
-          className="border p-2 w-full"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="border p-2 rounded-lg w-full text-sm 
+              transition-all 
+              peer-placeholder-shown:top-3.5 
+              peer-placeholder-shown:text-sm 
+              peer-focus:top-2 peer-focus:text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 
+              focus:border-indigo-500 transition"
         />
 
         <input
           type="password"
           placeholder="Password"
-          className="border p-2 w-full"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="border p-2 rounded-lg w-full text-sm 
+              transition-all 
+              peer-placeholder-shown:top-3.5 
+              peer-placeholder-shown:text-sm 
+              peer-focus:top-2 peer-focus:text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 
+              focus:border-indigo-500 transition"
         />
 
-        <button className="bg-black text-white px-4 py-2 w-full">
+        <button className="bg-indigo-600 text-white px-4 py-2 rounded-xl w-full hover:bg-indigo-700 shadow-sm transition">
           Register
         </button>
         <p className="text-sm text-center text-gray-600">
