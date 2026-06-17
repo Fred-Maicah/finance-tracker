@@ -1,4 +1,4 @@
-# 💰 Finance Tracker App
+# 💰 SaveTrust
 A full-stack fintech-style application that allows users to track income and expenses, visualize spending, and manage personal finances securely.
 
 ## 🚀 Features
